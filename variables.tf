@@ -1,7 +1,7 @@
 ### Cloud SQL
 
 variable "name" {
-  description = "The name of the database."
+  description = "The name of the database instance and database. Must be unique within the project."
   type        = string
 }
 
@@ -37,7 +37,7 @@ variable "region" {
 }
 
 variable "settings" {
-  description = "The settings to use for the database instance."
+  description = "Complete configuration for the Cloud SQL instance. See https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/instances for all options."
   type = object({
     tier                        = string
     edition                     = optional(string)
@@ -91,7 +91,7 @@ variable "settings" {
     ip_configuration = optional(object({
       ipv4_enabled                                  = optional(bool)
       private_network                               = optional(string)
-      require_ssl                                   = optional(bool)
+      ssl_mode                                      = optional(string)
       allocated_ip_range                            = optional(string)
       enable_private_path_for_google_cloud_services = optional(bool)
       authorized_networks = optional(object({
@@ -183,7 +183,7 @@ variable "settings" {
 }
 
 variable "database_version" {
-  description = "The database version to use. Check https://cloud.google.com/sql/docs/db-versions for supported versions."
+  description = "The database engine version to use. Format: [ENGINE]_[VERSION] (e.g. MYSQL_8_0, POSTGRES_14). See https://cloud.google.com/sql/docs/db-versions for supported versions."
   type        = string
 
   validation {

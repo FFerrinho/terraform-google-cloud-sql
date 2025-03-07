@@ -1,9 +1,11 @@
+# Generate a random string suffix for unique naming.
 resource "random_string" "main" {
   length  = 4
   special = false
   upper   = false
 }
 
+# Create the main database
 resource "google_sql_database" "main" {
   name            = var.name
   instance        = google_sql_database_instance.main.name
@@ -13,9 +15,11 @@ resource "google_sql_database" "main" {
   deletion_policy = var.deletion_policy
 }
 
+# Create the Cloud SQL instance with all supported configurations
 resource "google_sql_database_instance" "main" {
   region = var.region
 
+  # Dynamic settings block for all instance configurations
   dynamic "settings" {
     for_each = var.settings != null ? [var.settings] : []
     content {
@@ -34,6 +38,7 @@ resource "google_sql_database_instance" "main" {
       pricing_plan                = settings.value.pricing_plan
       time_zone                   = settings.value.time_zone
 
+      # Advanced machine configuration
       dynamic "advanced_machine_features" {
         for_each = settings.value.advanced_machine_features != null ? [settings.value.advanced_machine_features] : []
         content {
@@ -41,6 +46,7 @@ resource "google_sql_database_instance" "main" {
         }
       }
 
+      # Database flags for engine customization
       dynamic "database_flags" {
         for_each = settings.value.database_flags != null ? [settings.value.database_flags] : []
         content {
@@ -49,6 +55,7 @@ resource "google_sql_database_instance" "main" {
         }
       }
 
+      # Active Directory integration settings
       dynamic "active_directory_config" {
         for_each = settings.value.active_directory_config != null ? [settings.value.active_directory_config] : []
         content {
@@ -105,7 +112,7 @@ resource "google_sql_database_instance" "main" {
         content {
           ipv4_enabled                                  = ip_configuration.value.ipv4_enabled
           private_network                               = ip_configuration.value.private_network
-          require_ssl                                   = ip_configuration.value.require_ssl
+          ssl_mode                                      = ip_configuration.value.ssl_mode
           allocated_ip_range                            = ip_configuration.value.allocated_ip_range
           enable_private_path_for_google_cloud_services = ip_configuration.value.enable_private_path_for_google_cloud_services
 
@@ -210,7 +217,7 @@ resource "google_sql_database_instance" "main" {
     for_each = var.clone != null ? [var.clone] : []
     content {
       source_instance_name = clone.value.source_instance_name
-      point_in_time        = clone.value.point-in-time
+      point_in_time        = clone.value.point_in_time
       database_names       = clone.value.database_names
       allocated_ip_range   = clone.value.allocated_ip_range
     }
